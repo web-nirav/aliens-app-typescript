@@ -1,5 +1,4 @@
-
-name: CICD
+name: CICD WorkFlow
 
 on:
   push:
@@ -7,14 +6,12 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
       - name: Login to Docker Hub
-        run: docker login -u ${{ secret.DOCKER_USERNAME }} -p ${{ secret.DOCKER_PASSWORD }} 
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} 
       - name: Build Docker Image
         run: docker build -t niravprajapati/aliens-app-typescript .
       - name: Publish Image to Docker Hub
@@ -23,3 +20,10 @@ jobs:
   deploy:
     needs: build
     runs-on: aws-ec2
+    steps:
+      - name: Pull Image from Docker Hub
+        run: docker pull niravprajapati/aliens-app-typescript:latest
+      - name: Delete Old Container
+        run: docker rm -f reactContainer
+      - name: Run Docker Container
+        run: docker run -d -p 3000:80 --name reactContainer niravprajapati/aliens-app-typescript
