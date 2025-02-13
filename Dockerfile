@@ -3,7 +3,8 @@ FROM node:20.18.2-alpine3.21 as build
 WORKDIR /app 
 COPY package.json package-lock.json ./
 RUN rm -rf node_modules package-lock.json && \
-    npm install --legacy-peer-deps
+    npm install --legacy-peer-deps && \
+    npm install ajv ajv-keywords --save
 COPY . .
 RUN npm run build 
 
